@@ -1,0 +1,3 @@
+[submodule "API_Client_Auxiliary_service/PWP_JHHT_CLIENT"]
+	path = API_Client_Auxiliary_service/PWP_JHHT_CLIENT
+	url = https://github.com/Heiguli/PWP_JHHT_CLIENT.git

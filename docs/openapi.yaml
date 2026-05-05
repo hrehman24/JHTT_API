@@ -1,0 +1,948 @@
+openapi: 3.0.3
+info:
+  title: Beatify Music API
+  version: v1
+  description: REST API for artists, albums, tracks, users, and playlists.
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+  - url: http://130.162.240.153:5000
+    description: Public cloud deployment example
+
+tags:
+  - name: Root
+  - name: Artists
+  - name: Albums
+  - name: Tracks
+  - name: Users
+  - name: Playlists
+
+paths:
+  /:
+    get:
+      tags: [Root]
+      summary: Get API usage information
+      responses:
+        "200":
+          description: API info payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RootPayload"
+              examples:
+                default:
+                  value:
+                    api_name: Beatify Music API
+                    version: v1
+                    description: A RESTful API for managing artists, albums, tracks, users and playlists.
+                    how_to_use:
+                      methods: Use GET to read, POST to create, PUT to update, DELETE to remove.
+                      content_type: "All POST and PUT requests must use Content-Type: application/json"
+                      example: "To create an artist: POST /Beatify/api/v1/artists with body {\"name\": \"Eminem\"}"
+                    endpoints:
+                      Artists: http://localhost:5000/Beatify/api/v1/artists
+                      Albums: http://localhost:5000/Beatify/api/v1/albums
+                      Tracks: http://localhost:5000/Beatify/api/v1/tracks
+                      Users: http://localhost:5000/Beatify/api/v1/users
+                      Playlists: http://localhost:5000/Beatify/api/v1/playlists
+                    single_item: Add /<id> to any endpoint above, e.g. /Beatify/api/v1/artists/1
+
+  /Beatify/api/v1/artists:
+    get:
+      tags: [Artists]
+      summary: List artists
+      responses:
+        "200":
+          description: Artist list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Artist"
+              examples:
+                empty:
+                  value: []
+                withData:
+                  value:
+                    - name: Radiohead
+                    - name: Daft Punk
+    post:
+      tags: [Artists]
+      summary: Create artist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArtistCreate"
+            examples:
+              valid:
+                value: { name: Eminem }
+      responses:
+        "201":
+          description: Artist created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Artist Eminem created successfully!
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+    delete:
+      tags: [Artists]
+      summary: Delete all artists
+      responses:
+        "200":
+          description: Artists removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Deleted 3 artists
+
+  /Beatify/api/v1/artists/{id}:
+    parameters:
+      - $ref: "#/components/parameters/IdPath"
+    get:
+      tags: [Artists]
+      summary: Get one artist
+      responses:
+        "200":
+          description: Artist found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artist"
+              example:
+                name: Radiohead
+        "404":
+          $ref: "#/components/responses/ArtistNotFound"
+    put:
+      tags: [Artists]
+      summary: Update artist name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArtistCreate"
+            examples:
+              valid:
+                value: { name: The Weeknd }
+      responses:
+        "200":
+          description: Artist updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Artist The Weeknd updated successfully!
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/ArtistNotFound"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+    delete:
+      tags: [Artists]
+      summary: Delete one artist
+      responses:
+        "200":
+          description: Artist deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Artist Radiohead deleted successfully
+        "404":
+          $ref: "#/components/responses/ArtistNotFound"
+
+  /Beatify/api/v1/albums:
+    get:
+      tags: [Albums]
+      summary: List albums
+      responses:
+        "200":
+          description: Album list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Album"
+              examples:
+                empty:
+                  value: []
+                withData:
+                  value:
+                    - name: OK Computer
+                      artist_id: 1
+    post:
+      tags: [Albums]
+      summary: Create album
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlbumCreate"
+            examples:
+              valid:
+                value:
+                  name: Discovery
+                  artist_id: 2
+      responses:
+        "201":
+          description: Album created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Album Discovery created successfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+
+  /Beatify/api/v1/albums/{id}:
+    parameters:
+      - $ref: "#/components/parameters/IdPath"
+    get:
+      tags: [Albums]
+      summary: Get one album
+      responses:
+        "200":
+          description: Album found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Album"
+              example:
+                name: Discovery
+                artist_id: 2
+        "404":
+          $ref: "#/components/responses/AlbumNotFound404"
+    put:
+      tags: [Albums]
+      summary: Update album
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlbumCreate"
+      responses:
+        "200":
+          description: Album updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Album Discovery updated successfully
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/AlbumNotFound404"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+    delete:
+      tags: [Albums]
+      summary: Delete one album
+      responses:
+        "200":
+          description: Album deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Album Discovery deleted successfully
+        "400":
+          $ref: "#/components/responses/AlbumNotFound400"
+
+  /Beatify/api/v1/tracks:
+    get:
+      tags: [Tracks]
+      summary: List tracks
+      responses:
+        "200":
+          description: Track list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Track"
+              examples:
+                empty:
+                  value: []
+                withData:
+                  value:
+                    - name: One More Time
+                      length: 320
+                      album_id: 2
+    post:
+      tags: [Tracks]
+      summary: Create track
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrackCreate"
+      responses:
+        "201":
+          description: Track created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Track One More Time created successfully!
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/TrackAlbumNotFound"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+    delete:
+      tags: [Tracks]
+      summary: Delete all tracks
+      responses:
+        "200":
+          description: Tracks removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Deleted 15 tracks
+
+  /Beatify/api/v1/tracks/{id}:
+    parameters:
+      - $ref: "#/components/parameters/IdPath"
+    get:
+      tags: [Tracks]
+      summary: Get one track
+      responses:
+        "200":
+          description: Track found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Track"
+              example:
+                name: One More Time
+                length: 320
+                album_id: 2
+        "404":
+          $ref: "#/components/responses/TrackNotFound"
+    put:
+      tags: [Tracks]
+      summary: Update track
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrackCreate"
+      responses:
+        "200":
+          description: Track updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Track One More Time updated successfully!
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/TrackNotFound"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+    delete:
+      tags: [Tracks]
+      summary: Delete one track
+      responses:
+        "200":
+          description: Track deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Track One More Time deleted successfully
+        "404":
+          $ref: "#/components/responses/TrackNotFound"
+
+  /Beatify/api/v1/users:
+    get:
+      tags: [Users]
+      summary: List users
+      responses:
+        "200":
+          description: User list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserSummary"
+              examples:
+                empty:
+                  value: []
+                withData:
+                  value:
+                    - id: 1
+                      name: Alice
+    post:
+      tags: [Users]
+      summary: Create user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: User Alice created successfully!
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+    delete:
+      tags: [Users]
+      summary: Delete all users
+      responses:
+        "200":
+          description: Users removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Deleted 3 users
+
+  /Beatify/api/v1/users/{id}:
+    parameters:
+      - $ref: "#/components/parameters/IdPath"
+    get:
+      tags: [Users]
+      summary: Get one user with playlists
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserWithPlaylists"
+              examples:
+                noPlaylists:
+                  value:
+                    id: 1
+                    name: Alice
+                    playlists: []
+                withPlaylists:
+                  value:
+                    id: 1
+                    name: Alice
+                    playlists:
+                      - id: 1
+                        name: Favorites
+        "404":
+          $ref: "#/components/responses/UserNotFound"
+    put:
+      tags: [Users]
+      summary: Update user name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: User Alice updated successfully!
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/UserNotFound"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+    delete:
+      tags: [Users]
+      summary: Delete one user
+      responses:
+        "200":
+          description: User deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: User Alice deleted successfully
+        "404":
+          $ref: "#/components/responses/UserNotFound"
+
+  /Beatify/api/v1/playlists:
+    get:
+      tags: [Playlists]
+      summary: List playlists
+      responses:
+        "200":
+          description: Playlist list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PlaylistSummary"
+              examples:
+                empty:
+                  value: []
+                withData:
+                  value:
+                    - id: 1
+                      name: Favorites
+                      description: My favorite songs
+    post:
+      tags: [Playlists]
+      summary: Create playlist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaylistCreate"
+            examples:
+              simple:
+                value: { name: Favorites }
+              withDescription:
+                value:
+                  name: Chill Vibes
+                  description: Relaxing tracks
+              withUser:
+                value:
+                  name: Shared Mix
+                  user_id: 1
+      responses:
+        "201":
+          description: Playlist created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Playlist Favorites created successfully!
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/UserNotFound"
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+    delete:
+      tags: [Playlists]
+      summary: Delete all playlists
+      responses:
+        "200":
+          description: Playlists removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Deleted 2 playlists
+
+  /Beatify/api/v1/playlists/{id}:
+    parameters:
+      - $ref: "#/components/parameters/IdPath"
+    get:
+      tags: [Playlists]
+      summary: Get one playlist with users and tracks
+      responses:
+        "200":
+          description: Playlist found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlaylistDetailed"
+              examples:
+                emptyRelations:
+                  value:
+                    id: 1
+                    name: Favorites
+                    description: My favorite songs
+                    tracks: []
+                    users: []
+                populatedRelations:
+                  value:
+                    id: 1
+                    name: Favorites
+                    description: My favorite songs
+                    tracks:
+                      - id: 1
+                        name: One More Time
+                        length: 320
+                    users:
+                      - id: 1
+                        name: Alice
+        "404":
+          $ref: "#/components/responses/PlaylistNotFound"
+    put:
+      tags: [Playlists]
+      summary: Update playlist and optionally link user/track
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaylistUpdate"
+            examples:
+              rename:
+                value:
+                  name: Updated Playlist
+              addTrack:
+                value:
+                  name: Favorites
+                  track_id: 2
+              addUser:
+                value:
+                  name: Favorites
+                  user_id: 3
+      responses:
+        "200":
+          description: Playlist updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Playlist Favorites updated successfully!
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          description: Related resource not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              examples:
+                playlist:
+                  value: { message: Playlist not found }
+                track:
+                  value: { message: Track not found }
+                user:
+                  value: { message: User not found }
+        "415":
+          $ref: "#/components/responses/UnsupportedMediaType"
+    delete:
+      tags: [Playlists]
+      summary: Delete one playlist
+      responses:
+        "200":
+          description: Playlist deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+              example:
+                message: Playlist Favorites deleted successfully
+        "404":
+          $ref: "#/components/responses/PlaylistNotFound"
+
+components:
+  parameters:
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+
+  responses:
+    BadRequest:
+      description: Invalid input or business rule violation
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+          examples:
+            missingFields:
+              value: { message: Incomplete request - missing fields }
+            invalidTypes:
+              value: { message: Invalid data types for fields }
+            integrityError:
+              value: { message: Database integrity error - possible duplicate entry }
+    UnsupportedMediaType:
+      description: Request body is not JSON
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+          example: { message: Request content type must be JSON }
+    ArtistNotFound:
+      description: Artist not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+          example: { message: Artist not found }
+    AlbumNotFound404:
+      description: Album not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+          example: { message: Album not found }
+    AlbumNotFound400:
+      description: Album not found (implementation returns HTTP 400 for delete)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+          example: { message: Album not found }
+    TrackAlbumNotFound:
+      description: Referenced album not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+          example: { message: Album not found }
+    TrackNotFound:
+      description: Track not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+          example: { message: Track not found }
+    UserNotFound:
+      description: User not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+          example: { message: User not found }
+    PlaylistNotFound:
+      description: Playlist not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Message"
+          example: { message: Playlist not found }
+
+  schemas:
+    Message:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+
+    RootPayload:
+      type: object
+      properties:
+        api_name:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+        how_to_use:
+          type: object
+        endpoints:
+          type: object
+        single_item:
+          type: string
+
+    Artist:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+
+    ArtistCreate:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          example: Eminem
+
+    Album:
+      type: object
+      required: [name, artist_id]
+      properties:
+        name:
+          type: string
+        artist_id:
+          type: integer
+
+    AlbumCreate:
+      type: object
+      required: [name, artist_id]
+      properties:
+        name:
+          type: string
+        artist_id:
+          type: integer
+
+    Track:
+      type: object
+      required: [name, length, album_id]
+      properties:
+        name:
+          type: string
+        length:
+          type: integer
+        album_id:
+          type: integer
+
+    TrackCreate:
+      type: object
+      required: [name, length, album_id]
+      properties:
+        name:
+          type: string
+        length:
+          type: integer
+        album_id:
+          type: integer
+
+    UserSummary:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    UserCreate:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+
+    PlaylistSummaryRef:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    UserWithPlaylists:
+      type: object
+      required: [id, name, playlists]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        playlists:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlaylistSummaryRef"
+
+    PlaylistSummary:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+
+    PlaylistCreate:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        user_id:
+          type: integer
+
+    PlaylistUpdate:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        track_id:
+          type: integer
+        user_id:
+          type: integer
+
+    PlaylistTrackRef:
+      type: object
+      required: [id, name, length]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        length:
+          type: integer
+
+    UserRef:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    PlaylistDetailed:
+      type: object
+      required: [id, name, description, tracks, users]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        tracks:
+          type: array
+          items:
+            $ref: "#/components/schemas/PlaylistTrackRef"
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserRef"
