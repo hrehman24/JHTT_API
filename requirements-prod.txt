@@ -5,3 +5,4 @@ SQLAlchemy==2.0.46
 gunicorn==23.0.0
 supervisor==4.2.5
 setuptools>=68
+pysqlite3==0.6.0
