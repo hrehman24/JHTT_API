@@ -13,6 +13,7 @@ COPY requirements-prod.txt /app/requirements-prod.txt
 RUN pip install --no-cache-dir -r /app/requirements-prod.txt
 
 COPY . /app
+RUN pip install --no-cache-dir /app
 
 RUN chmod +x /app/docker/entrypoint.sh
 RUN mkdir -p /etc/supervisor/conf.d
