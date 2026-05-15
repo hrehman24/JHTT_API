@@ -1,14 +1,15 @@
-"""Package metadata and legacy setup shim.
+"""Minimal setuptools configuration.
 
-This file intentionally contains no runtime side-effects. Build and
-installation metadata are provided in `pyproject.toml`. Runtime setup
-tasks (database creation, seeding, etc.) are handled by the container
-entrypoint or explicit developer scripts, not during package build.
+Most metadata is in pyproject.toml. This file is kept for compatibility
+with older tools and to ensure setuptools generates proper package metadata
+during wheel builds.
 """
 
-from pathlib import Path
+from setuptools import setup, find_packages
 
-# Keep a minimal shim so legacy tooling that expects `setup.py` to exist
-# won't fail. Do not perform any actions on import or execution.
-
-__all__ = ["Path"]
+setup(
+    name="beatify-api",
+    version="0.1.0",
+    packages=find_packages(include=["Beatify*"]),
+    python_requires=">=3.10",
+)
